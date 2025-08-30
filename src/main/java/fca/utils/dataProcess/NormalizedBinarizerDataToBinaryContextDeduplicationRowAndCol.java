@@ -1,18 +1,18 @@
 package fca.utils.dataProcess;
 
-import fca.utils.readFile.DeduplicatingBinarizerProcessor;
+import fca.utils.readFile.PurifyingBinarizerProcessor;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class NormalizedBinarizerDataToBinaryContextDeduplication {
+public class NormalizedBinarizerDataToBinaryContextDeduplicationRowAndCol {
 
     public static void main(String[] args) {
         // --- 配置区 ---
         // 1. 设置要处理的原始数据集文件名 (假设在 data/uci/ 目录下)
-        String uciDatasetName = "iris.data";
+        String uciDatasetName = "mushroom.data";
 
         // 2. 自动生成输出文件名
         String baseName = uciDatasetName.endsWith(".data") ? uciDatasetName.substring(0, uciDatasetName.length() - 5) : uciDatasetName;
@@ -21,12 +21,12 @@ public class NormalizedBinarizerDataToBinaryContextDeduplication {
 
 
         String inputFilePath = "src/main/java/data/uci/" + uciDatasetName;
-        System.out.println(uciDatasetName + " 数据集转换 (混合处理 + 行去重)...");
+        System.out.println(uciDatasetName + " 数据集转换 (混合处理 + 行列去重)...");
         System.out.println("原始文件路径: " + inputFilePath);
 
         try {
-            // 调用新的、带去重功能的处理方法
-            String outputFilePath = DeduplicatingBinarizerProcessor.process(inputFilePath, outputContextName);
+            // 调用新的、带行列去重功能的处理方法
+            String outputFilePath = PurifyingBinarizerProcessor.process(inputFilePath, outputContextName);
             System.out.println("输出的形式背景文件路径: " + outputFilePath);
 
             Path path = Paths.get(outputFilePath);
