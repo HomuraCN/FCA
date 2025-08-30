@@ -12,7 +12,7 @@ public class PermutationsTest {
     @Test
     public void testPermutations() {
         try {
-            ArrayList<BitSet> bitSetArrayList = BitSetFileHandler.readFromFile("src/main/java/data/reduction/car_reduction.data.txt");
+            ArrayList<BitSet> bitSetArrayList = BitSetFileHandler.readFromFile("src/main/java/data/reduction/iris_deduplication_reduction.data.txt");
             ArrayList<BitSet> reductions = permutations.permutations_exe(bitSetArrayList);
             System.out.println(reductions);
         } catch (IOException e) {
