@@ -12,7 +12,7 @@ import java.util.*;
 
 public class BinaryContextToReduction {
     public static void main(String[] args) {
-        String fileName = "iris_deduplication.data.txt";
+        String fileName = "Wholesale customers data_deduplication.data.txt";
         String filePath = "src/main/java/data/context/" + fileName;
         int numThreads = 16; // 您可以根据您的CPU核心数调整此值
 
