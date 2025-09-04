@@ -16,8 +16,8 @@ public class ReverseGeneratedConceptWholesaleTest {
     @Test
     public void testCombinationReduction() {
         try {
-            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/Wholesale customers data_deduplication_lattice.data.txt");
-            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/Wholesale customers data_deduplication_reduction_permutations.data.txt");
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/test_deduplication_lattice.data.txt");
+            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/test_deduplication_reduction_permutations.data.txt");
             ReverseGeneratedConcept rc = new ReverseGeneratedConcept();
             ArrayList<Concept> combinationReduction = rc.combinationReduction(concepts, reductions);
             for (Concept concept : combinationReduction) {
@@ -33,13 +33,13 @@ public class ReverseGeneratedConceptWholesaleTest {
     @Test
     public void testReverseGeneratedContext() {
         try {
-            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/Wholesale customers data_deduplication_lattice.data.txt");
-            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/Wholesale customers data_deduplication_reduction_permutations.data.txt");
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/test_deduplication_lattice.data.txt");
+            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/test_deduplication_reduction_permutations.data.txt");
             ReverseGeneratedConcept rc = new ReverseGeneratedConcept();
             ArrayList<Concept> combinationReduction = rc.combinationReduction(concepts, reductions);
 
-            Context context = File.readFile("src/main/java/data/context/Wholesale customers data_deduplication.data.txt");
-            ReverseGeneratedConcept.reverseGeneratedContext(context, combinationReduction, "Wholesale customers data");
+            Context context = File.readFile("src/main/java/data/context/test_deduplication.data.txt");
+            ReverseGeneratedConcept.reverseGeneratedContext(context, combinationReduction, "test");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -48,9 +48,9 @@ public class ReverseGeneratedConceptWholesaleTest {
     public void testReverseGeneratedConceptLatticeUsingExtents(){
         long startTime = System.currentTimeMillis();
         try {
-            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/Wholesale customers data_deduplication_lattice.data.txt");
-            Context reverseContext = File.readFile("src/main/java/data/reverse_context/Wholesale customers data_reverse.data.txt");
-            ReverseGeneratedConcept.reverseGeneratedConceptLatticeUsingExtents(concepts, reverseContext, "Wholesale customers data");
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/test_deduplication_lattice.data.txt");
+            Context reverseContext = File.readFile("src/main/java/data/reverse_context/test_reverse.data.txt");
+            ReverseGeneratedConcept.reverseGeneratedConceptLatticeUsingExtents(concepts, reverseContext, "test");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -61,12 +61,12 @@ public class ReverseGeneratedConceptWholesaleTest {
     public void testReverseGeneratedConceptLatticeUsingIntents() {
         long startTime = System.currentTimeMillis();
         try {
-            Context context = File.readFile("src/main/java/data/context/Wholesale customers data_deduplication.data.txt");
-            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/Wholesale customers data_deduplication_lattice.data.txt");
+            Context context = File.readFile("src/main/java/data/context/test_deduplication.data.txt");
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/test_deduplication_lattice.data.txt");
             ReverseGeneratedConcept rc = new ReverseGeneratedConcept();
-            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/Wholesale customers data_deduplication_reduction_permutations.data.txt");
+            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/test_deduplication_reduction_permutations.data.txt");
             ArrayList<Concept> combinationReduction = rc.combinationReduction(concepts, reductions);
-            ReverseGeneratedConcept.reverseGeneratedConceptLatticeUsingIntents(context, concepts, combinationReduction, "Wholesale customers data");
+            ReverseGeneratedConcept.reverseGeneratedConceptLatticeUsingIntents(context, concepts, combinationReduction, "test");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
