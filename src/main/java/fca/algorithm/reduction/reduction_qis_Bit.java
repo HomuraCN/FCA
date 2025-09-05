@@ -13,6 +13,7 @@ import static fca.utils.util.intersection;
 import static fca.utils.util.is_subset;
 
 
+// 求代表概念集
 public class reduction_qis_Bit {
     public static ArrayList<BitSet> reduction_qis_exe_bit(Context context, Queue<Concept> concepts,int threads) {
         long start = System.currentTimeMillis();

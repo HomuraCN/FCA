@@ -10,6 +10,7 @@ import fca.utils.readFile.File;
 import java.io.IOException;
 import java.util.*;
 
+// 形式背景 -> 代表概念集
 public class BinaryContextToReduction {
     public static void main(String[] args) {
         String fileName = "test_deduplication.data.txt";
