@@ -34,7 +34,7 @@ public class ReverseGeneratedConcept {
             // 遍历minBitSet中所有为1的位
             for (int i = minBitSet.nextSetBit(0); i >= 0; i = minBitSet.nextSetBit(i + 1)) {
                 // 根据索引（即概念id）从concepts列表中获取概念并添加到结果列表中
-                if (i < concepts.size()) {
+                if (i < concepts.size() + 1) {
                     combinationReduction.add(concepts.get(i - 1));
                 }
             }
