@@ -10,6 +10,7 @@ import java.util.*;
 
 import static fca.utils.util.*;
 
+// 建格算法
 public class InClose3 {
     private static int id=1;
     public static void inClose3_exe(Context context, Concept concept, int v,
