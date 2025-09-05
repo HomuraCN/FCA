@@ -14,6 +14,7 @@ import java.util.BitSet;
  * 它读取一个约简（一个 BitSet 列表），处理它以找到排列组合，
  * 并将结果写入一个新文件。
  */
+// 代表概念集 -> 概念约简
 public class ReductionToPermutations {
     public static void main(String[] args) {
         // --- 1. 配置 ---

@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+// 原始.csv后缀数据 -> 形式背景(净化背景)
 public class NormalizedBinarizerCSVToBinaryContextDeduplicationRowAndCol {
 
     public static void main(String[] args) {

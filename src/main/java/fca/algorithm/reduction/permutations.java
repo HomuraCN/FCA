@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 
 import static fca.utils.util.is_subset_eq;
 
+
+// 代表概念集 -> 组合约简
 public class permutations {
     public static ArrayList<BitSet> permutations_exe(ArrayList<BitSet> concepts){
         //如果只有一个元素，说明结果就是该元素

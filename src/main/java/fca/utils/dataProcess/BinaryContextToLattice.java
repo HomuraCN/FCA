@@ -12,6 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+// 形式背景 -> 建格
 public class BinaryContextToLattice {
     public static void main(String[] args) {
         // --- 1. 配置输入和输出文件 ---
