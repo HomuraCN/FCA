@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+// 原始.data后缀数据 -> 形式背景(非净化背景)
 public class DataToBinaryContext {
     public static void main(String[] args) {
         // 转换的数据集文件名

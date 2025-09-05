@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.BitSet;
 
+// 数据集测试
 public class ReverseGeneratedConceptIrisTest {
     @Test
     public void testCombinationReduction() {
