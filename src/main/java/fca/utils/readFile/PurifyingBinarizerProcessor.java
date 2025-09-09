@@ -39,14 +39,13 @@ public class PurifyingBinarizerProcessor {
         // --- 步骤 2: 判断每一列的数据类型 ---
         boolean[] isNumeric = new boolean[numAttributes];
         Arrays.fill(isNumeric, true);
-        for (int j = 0; j < numAttributes; j++) {
-            for (String[] row : allRows) {
-                try {
-                    Double.parseDouble(row[j]);
-                } catch (NumberFormatException e) {
-                    isNumeric[j] = false;
-                    break;
-                }
+        String[] col = allRows.getFirst();
+        for (int i = 0; i < numAttributes; i++) {
+            try {
+                Double.parseDouble(col[i]);
+            } catch (NumberFormatException e) {
+                isNumeric[i] = false;
+                break;
             }
         }
 
