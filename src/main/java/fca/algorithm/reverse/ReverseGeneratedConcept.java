@@ -203,4 +203,36 @@ public class ReverseGeneratedConcept {
 
         return reverseLattice;
     }
+
+    /**
+     * 根据组合约简生成逆向形式背景
+     * @param context 原始形式背景，主要用于获取对象信息
+     * @param combinationReduction 组合约简的概念集合
+     * @return 一个Map，key是对象ID，value是该对象拥有的新属性集合(BitSet)
+     */
+    public static Map<Integer, BitSet> generateReverseContext(Context context, ArrayList<Concept> combinationReduction) {
+        // A_g 代表原始形式背景中每个对象的属性集
+        ArrayList<BitSet> A_g = new ArrayList<>();
+        Map<Integer, BitSet> objs = context.getObjs();
+        for (int i = 1; i <= context.getObjs_size(); i++) {
+            A_g.add(objs.get(i));
+        }
+
+        Map<Integer, BitSet> reverseContext = new HashMap<>();
+        int numNewAttributes = combinationReduction.size();
+
+        for (int i = 0; i < A_g.size(); i++) {
+            int objectId = i + 1;
+            BitSet newAttributes = new BitSet(numNewAttributes);
+            for (int j = 0; j < numNewAttributes; j++) {
+                // 如果对象的原始属性集是组合约简中概念内涵的父集，则该对象拥有这个新属性
+                if (util.is_subset_eq(A_g.get(i), combinationReduction.get(j).getIntent())) {
+                    // j就是新属性的索引
+                    newAttributes.set(j);
+                }
+            }
+            reverseContext.put(objectId, newAttributes);
+        }
+        return reverseContext;
+    }
 }
