@@ -17,7 +17,7 @@ public class BinaryContextToLattice {
     public static void main(String[] args) {
         // --- 1. 配置输入和输出文件 ---
         // 您可以在这里更改要处理的文件名
-        String inputFileName = "test_deduplication.data.txt";
+        String inputFileName = "yeast_deduplication.data.txt";
         String inputFilePath = "src/main/java/data/context/" + inputFileName;
 
         String outputDir = "src/main/java/data/lattice/";
