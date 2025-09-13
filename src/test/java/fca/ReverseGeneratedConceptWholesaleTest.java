@@ -73,4 +73,18 @@ public class ReverseGeneratedConceptWholesaleTest {
         long endTime = System.currentTimeMillis();
         System.out.println("算法3共耗时: " + (endTime - startTime) + "ms");
     }
+    @Test
+    public void testGetAllCombinationReduction() {
+        try {
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/test_deduplication_lattice.data.txt");
+            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/test_deduplication_reduction_permutations.data.txt");
+            ReverseGeneratedConcept rc = new ReverseGeneratedConcept();
+            ArrayList<ArrayList<Concept>> combinationReduction = rc.getAllCombinationReduction(concepts, reductions);
+            for (ArrayList<Concept> concept : combinationReduction) {
+                System.out.println(concept);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
