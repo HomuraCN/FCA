@@ -45,7 +45,6 @@ public class PurifyingBinarizerProcessor {
                 Double.parseDouble(col[i]);
             } catch (NumberFormatException e) {
                 isNumeric[i] = false;
-                break;
             }
         }
 

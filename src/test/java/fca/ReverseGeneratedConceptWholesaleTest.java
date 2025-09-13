@@ -33,13 +33,13 @@ public class ReverseGeneratedConceptWholesaleTest {
     @Test
     public void testReverseGeneratedContext() {
         try {
-            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/test_deduplication_lattice.data.txt");
-            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/test_deduplication_reduction_permutations.data.txt");
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/Indian Liver Patient Dataset (ILPD)_deduplication_lattice.data.txt");
+            ArrayList<BitSet> reductions = BitSetFileHandler.readFromFile("src/main/java/data/reduction_permutations/Indian Liver Patient Dataset (ILPD)_deduplication_reduction_permutations.data.txt");
             ReverseGeneratedConcept rc = new ReverseGeneratedConcept();
             ArrayList<Concept> combinationReduction = rc.combinationReduction(concepts, reductions);
 
-            Context context = File.readFile("src/main/java/data/context/test_deduplication.data.txt");
-            ReverseGeneratedConcept.reverseGeneratedContext(context, combinationReduction, "test");
+            Context context = File.readFile("src/main/java/data/context/Indian Liver Patient Dataset (ILPD)_deduplication.data.txt");
+            ReverseGeneratedConcept.reverseGeneratedContext(context, combinationReduction, "Indian Liver Patient Dataset (ILPD)");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -48,9 +48,9 @@ public class ReverseGeneratedConceptWholesaleTest {
     public void testReverseGeneratedConceptLatticeUsingExtents(){
         long startTime = System.currentTimeMillis();
         try {
-            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/test_deduplication_lattice.data.txt");
-            Context reverseContext = File.readFile("src/main/java/data/reverse_context/test_reverse.data.txt");
-            ReverseGeneratedConcept.reverseGeneratedConceptLatticeUsingExtents(concepts, reverseContext, "test");
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/Indian Liver Patient Dataset (ILPD)_deduplication_lattice.data.txt");
+            Context reverseContext = File.readFile("src/main/java/data/reverse_context/Indian Liver Patient Dataset (ILPD)_reverse.data.txt");
+            ReverseGeneratedConcept.reverseGeneratedConceptLatticeUsingExtents(concepts, reverseContext, "Indian Liver Patient Dataset (ILPD)");
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
