@@ -43,6 +43,47 @@ public class ReverseGeneratedConcept {
         return combinationReduction;
     };
 
+    /**
+     * 【新方法】获取所有基数最小的组合约简方案。
+     * 首先找到所有约简方案中最小的概念数量，然后返回所有等于该数量的组合约简。
+     * @param concepts 完整的概念格
+     * @param reductions 多个约简方案的BitSet表示
+     * @return 包含所有基数最小的组合约简方案的列表
+     */
+    public ArrayList<ArrayList<Concept>> getAllCombinationReduction(ArrayList<Concept> concepts, ArrayList<BitSet> reductions) {
+        ArrayList<ArrayList<Concept>> allSmallestReductions = new ArrayList<>();
+        if (reductions == null || reductions.isEmpty() || concepts == null) {
+            return allSmallestReductions;
+        }
+
+        // --- 步骤 1: 找到最小基数 ---
+        int minCardinality = Integer.MAX_VALUE;
+        for (BitSet bs : reductions) {
+            int currentCardinality = bs.cardinality();
+            if (currentCardinality < minCardinality) {
+                minCardinality = currentCardinality;
+            }
+        }
+
+        // --- 步骤 2: 收集所有基数等于最小基数的约简 ---
+        for (BitSet reductionBitSet : reductions) {
+            if (reductionBitSet.cardinality() == minCardinality) {
+                ArrayList<Concept> currentReduction = new ArrayList<>();
+                // 将当前BitSet转换为Concept列表
+                for (int i = reductionBitSet.nextSetBit(0); i >= 0; i = reductionBitSet.nextSetBit(i + 1)) {
+                    // 假设概念ID从1开始，并且concepts列表是0-indexed且按ID顺序排列
+                    if (i > 0 && i <= concepts.size()) {
+                        // concepts.get(i-1) 对应 ID 为 i 的概念
+                        currentReduction.add(concepts.get(i - 1));
+                    }
+                }
+                allSmallestReductions.add(currentReduction);
+            }
+        }
+
+        return allSmallestReductions;
+    }
+
     public static void reverseGeneratedContext_temp(Context context, ArrayList<Concept> combinationReduction){
         ArrayList<BitSet> A_g = new ArrayList<>();
         Map<Integer, BitSet> objs = context.getObjs();
