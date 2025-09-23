@@ -2,6 +2,7 @@ package fca;
 
 import fca.utils.Context;
 import fca.utils.concept.AEConcept_id;
+import fca.utils.readFile.AELatticeFileHandler;
 import fca.utils.readFile.File;
 import org.junit.jupiter.api.Test;
 
@@ -38,6 +39,17 @@ public class AEConceptTest {
             System.out.println(res.size());
             long end_t = System.currentTimeMillis();
             System.out.println("消耗时间为"+(end_t - start_t)+"ms");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Test
+    void AELatticeFileHandlerTest() {
+        try {
+            ArrayList<AEConcept_id> aeConceptIds = AELatticeFileHandler.readAELatticeFromFile("src/main/java/data/lattice3C/test_deduplication_aelattice.data.txt");
+            for(AEConcept_id aeConceptId:aeConceptIds){
+                System.out.println(aeConceptId);
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
