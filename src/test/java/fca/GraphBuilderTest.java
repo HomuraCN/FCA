@@ -24,7 +24,7 @@ public class GraphBuilderTest {
             ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/iris_lattice.data.txt");
             
             // 3. 调用新方法构建邻接矩阵，并传入对象总数
-            int[][] a_plus = GraphBuilder.buildAdjacencyMatrix(concepts, objectCount);
+            int[][] a_plus = GraphBuilder.buildAdjacencyMatrixDG(concepts, objectCount);
 
             // 4. (可选) 打印矩阵以验证结果
             System.out.println("邻接矩阵 A_plus 构建完成。");
@@ -57,11 +57,11 @@ public class GraphBuilderTest {
 
             // 3. 构建邻接矩阵
             System.out.println("正在构建邻接矩阵 A_plus...");
-            int[][] a_plus = GraphBuilder.buildAdjacencyMatrix(concepts, objectCount);
+            int[][] a_plus = GraphBuilder.buildAdjacencyMatrixDG(concepts, objectCount);
             System.out.println("构建完成。");
 
             // 4. 将矩阵写入文件
-            String outputFilePath = "src/main/java/data/graph/" + datasetName + "_A_plus.csv";
+            String outputFilePath = "src/main/java/data/graph/" + datasetName + "_A_plus_DG.csv";
             GraphBuilder.writeMatrixToFile(a_plus, outputFilePath);
 
         } catch (IOException e) {
@@ -82,11 +82,11 @@ public class GraphBuilderTest {
 
             // 3. 构建邻接矩阵
             System.out.println("正在构建邻接矩阵 A_negative...");
-            int[][] a_negative = GraphBuilder.buildAEAdjacencyMatrix(concepts, objectCount);
+            int[][] a_negative = GraphBuilder.buildAEAdjacencyMatrixDG(concepts, objectCount);
             System.out.println("构建完成。");
 
             // 4. 将矩阵写入文件
-            String outputFilePath = "src/main/java/data/graph/" + datasetName + "_A_negative.csv";
+            String outputFilePath = "src/main/java/data/graph/" + datasetName + "_A_negative_DG.csv";
             GraphBuilder.writeMatrixToFile(a_negative, outputFilePath);
 
         } catch (IOException e) {

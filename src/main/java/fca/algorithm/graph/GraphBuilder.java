@@ -26,7 +26,7 @@ public class GraphBuilder {
      * @param objectCount 形式背景中的对象总数，用于定义邻接矩阵的维度。
      * @return 代表对象间连接强度的邻接矩阵 A_plus。
      */
-    public static int[][] buildAdjacencyMatrix(ArrayList<Concept> concepts, int objectCount) {
+    public static int[][] buildAdjacencyMatrixDG(ArrayList<Concept> concepts, int objectCount) {
         if (concepts == null || concepts.isEmpty() || objectCount <= 0) {
             return new int[0][0];
         }
@@ -89,7 +89,7 @@ public class GraphBuilder {
         return a_plus;
     }
 
-    public static int[][] buildAEAdjacencyMatrix(ArrayList<AEConcept_id> concepts, int objectCount){
+    public static int[][] buildAEAdjacencyMatrixDG(ArrayList<AEConcept_id> concepts, int objectCount){
         if (concepts == null || concepts.isEmpty() || objectCount <= 0) {
             return new int[0][0];
         }
