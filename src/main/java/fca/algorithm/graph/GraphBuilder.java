@@ -89,6 +89,70 @@ public class GraphBuilder {
         return a_plus;
     }
 
+    public static int[][] buildAdjacencyMatrixUG(ArrayList<Concept> concepts, int objectCount) {
+        if (concepts == null || concepts.isEmpty() || objectCount <= 0) {
+            return new int[0][0];
+        }
+
+        // --- 步骤 1: 使用传入的参数初始化邻接矩阵 ---
+        int[][] a_plus = new int[objectCount][objectCount];
+
+        // --- 步骤 2: 使用 O(n^3) 算法寻找覆盖关系并更新矩阵 ---
+        int n = concepts.size();
+        // 遍历每一对可能的 (子概念, 父概念) 组合
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                Concept c_child = concepts.get(i);
+                Concept c_parent = concepts.get(j);
+
+                // 条件1: c_child 必须是 c_parent 的严格子概念
+                // 我们使用 is_subset 函数，它判断 c_parent.getExtent() 是否真包含 c_child.getExtent()
+                if (is_subset(c_parent.getExtent(), c_child.getExtent())) {
+
+                    boolean isDirectParent = true;
+                    // 条件2: 检查是否存在任何“中间”概念 c_k
+                    for (int k = 0; k < n; k++) {
+                        if (k == i || k == j) {
+                            continue;
+                        }
+                        Concept c_k = concepts.get(k);
+
+                        // 如果存在 c_k 使得 c_child < c_k < c_parent
+                        if (is_subset(c_k.getExtent(), c_child.getExtent()) && is_subset(c_parent.getExtent(), c_k.getExtent())) {
+                            isDirectParent = false;
+                            break; // 已找到中间概念，c_parent 不直接覆盖 c_child
+                        }
+                    }
+
+                    // 如果检查完所有 c_k 后，仍然是直接父子关系
+                    if (isDirectParent) {
+                        // --- 步骤 3: 更新邻接矩阵 A_plus ---
+                        BitSet parentExtent = c_parent.getExtent();
+                        BitSet childExtent = c_child.getExtent();
+
+                        // 遍历父概念外延中的每个对象 xi
+                        for (int xi = parentExtent.nextSetBit(1); xi >= 0; xi = parentExtent.nextSetBit(xi + 1)) {
+                            // 遍历子概念外延中的每个对象 xj
+                            for (int xj = childExtent.nextSetBit(1); xj >= 0; xj = childExtent.nextSetBit(xj + 1)) {
+                                // 对象ID从1开始，数组索引从0开始，所以需要减1
+                                if (xi - 1 < objectCount && xj - 1 < objectCount) {
+                                    a_plus[xi - 1][xj - 1]++;
+                                    a_plus[xj - 1][xi - 1]++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return a_plus;
+    }
+
     public static int[][] buildAEAdjacencyMatrixDG(ArrayList<AEConcept_id> concepts, int objectCount){
         if (concepts == null || concepts.isEmpty() || objectCount <= 0) {
             return new int[0][0];
@@ -141,6 +205,70 @@ public class GraphBuilder {
                                 // 对象ID从1开始，数组索引从0开始，所以需要减1
                                 if (xi - 1 < objectCount && xj - 1 < objectCount) {
                                     a_negative[xi - 1][xj - 1]++;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return a_negative;
+    }
+
+    public static int[][] buildAEAdjacencyMatrixUG(ArrayList<AEConcept_id> concepts, int objectCount){
+        if (concepts == null || concepts.isEmpty() || objectCount <= 0) {
+            return new int[0][0];
+        }
+
+        // --- 步骤 1: 使用传入的参数初始化邻接矩阵 ---
+        int[][] a_negative = new int[objectCount][objectCount];
+
+        // --- 步骤 2: 使用 O(n^3) 算法寻找覆盖关系并更新矩阵 ---
+        int n = concepts.size();
+        // 遍历每一对可能的 (子概念, 父概念) 组合
+        for (int i = 0; i < n; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == j) {
+                    continue;
+                }
+
+                AEConcept_id c_child = concepts.get(i);
+                AEConcept_id c_parent = concepts.get(j);
+
+                // 条件1: c_child 必须是 c_parent 的严格子概念
+                // 我们使用 is_subset 函数，它判断 c_parent.getExtent_n() 是否真包含 c_child.getExtent_n()
+                if (is_subset(c_parent.getExtent_n(), c_child.getExtent_n())) {
+
+                    boolean isDirectParent = true;
+                    // 条件2: 检查是否存在任何“中间”概念 c_k
+                    for (int k = 0; k < n; k++) {
+                        if (k == i || k == j) {
+                            continue;
+                        }
+                        AEConcept_id c_k = concepts.get(k);
+
+                        // 如果存在 c_k 使得 c_child < c_k < c_parent
+                        if (is_subset(c_k.getExtent_n(), c_child.getExtent_n()) && is_subset(c_parent.getExtent_n(), c_k.getExtent_n())) {
+                            isDirectParent = false;
+                            break; // 已找到中间概念，c_parent 不直接覆盖 c_child
+                        }
+                    }
+
+                    // 如果检查完所有 c_k 后，仍然是直接父子关系
+                    if (isDirectParent) {
+                        // --- 步骤 3: 更新邻接矩阵 A_negative ---
+                        BitSet parentExtent = c_parent.getExtent_n();
+                        BitSet childExtent = c_child.getExtent_n();
+
+                        // 遍历父概念外延中的每个对象 xi
+                        for (int xi = parentExtent.nextSetBit(1); xi >= 0; xi = parentExtent.nextSetBit(xi + 1)) {
+                            // 遍历子概念外延中的每个对象 xj
+                            for (int xj = childExtent.nextSetBit(1); xj >= 0; xj = childExtent.nextSetBit(xj + 1)) {
+                                // 对象ID从1开始，数组索引从0开始，所以需要减1
+                                if (xi - 1 < objectCount && xj - 1 < objectCount) {
+                                    a_negative[xi - 1][xj - 1]++;
+                                    a_negative[xj - 1][xi - 1]++;
                                 }
                             }
                         }

@@ -44,7 +44,7 @@ public class GraphBuilderTest {
     }
 
     @Test
-    public void testBuildAndWriteAdjacencyMatrix() {
+    public void testBuildAndWriteAdjacencyMatrixDG() {
         try {
             String datasetName = "test_deduplication"; // 方便切换数据集
 
@@ -69,7 +69,7 @@ public class GraphBuilderTest {
         }
     }
     @Test
-    public void testBuildAndWriteAEAdjacencyMatrix(){
+    public void testBuildAndWriteAEAdjacencyMatrixDG(){
         try {
             String datasetName = "test_deduplication"; // 方便切换数据集
 
@@ -87,6 +87,56 @@ public class GraphBuilderTest {
 
             // 4. 将矩阵写入文件
             String outputFilePath = "src/main/java/data/graph/" + datasetName + "_A_negative_DG.csv";
+            GraphBuilder.writeMatrixToFile(a_negative, outputFilePath);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Test
+    public void testBuildAndWriteAdjacencyMatrixUG() {
+        try {
+            String datasetName = "test_deduplication"; // 方便切换数据集
+
+            // 1. 加载形式背景
+            Context context = File.readFile("src/main/java/data/context/" + datasetName + ".data.txt");
+            int objectCount = context.getObjs_size();
+
+            // 2. 加载概念格
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/" + datasetName + "_lattice.data.txt");
+
+            // 3. 构建邻接矩阵
+            System.out.println("正在构建邻接矩阵 A_plus...");
+            int[][] a_plus = GraphBuilder.buildAdjacencyMatrixUG(concepts, objectCount);
+            System.out.println("构建完成。");
+
+            // 4. 将矩阵写入文件
+            String outputFilePath = "src/main/java/data/graph/" + datasetName + "_A_plus_UG.csv";
+            GraphBuilder.writeMatrixToFile(a_plus, outputFilePath);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Test
+    public void testBuildAndWriteAEAdjacencyMatrixUG(){
+        try {
+            String datasetName = "test_deduplication"; // 方便切换数据集
+
+            // 1. 加载形式背景
+            Context context = File.readFile("src/main/java/data/context/" + datasetName + ".data.txt");
+            int objectCount = context.getObjs_size();
+
+            // 2. 加载概念格
+            ArrayList<AEConcept_id> concepts = AELatticeFileHandler.readAELatticeFromFile("src/main/java/data/lattice3C/" + datasetName + "_aelattice.data.txt");
+
+            // 3. 构建邻接矩阵
+            System.out.println("正在构建邻接矩阵 A_negative...");
+            int[][] a_negative = GraphBuilder.buildAEAdjacencyMatrixUG(concepts, objectCount);
+            System.out.println("构建完成。");
+
+            // 4. 将矩阵写入文件
+            String outputFilePath = "src/main/java/data/graph/" + datasetName + "_A_negative_UG.csv";
             GraphBuilder.writeMatrixToFile(a_negative, outputFilePath);
 
         } catch (IOException e) {
