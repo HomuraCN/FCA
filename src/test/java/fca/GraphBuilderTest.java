@@ -96,7 +96,7 @@ public class GraphBuilderTest {
     @Test
     public void testBuildAndWriteAdjacencyMatrixUG() {
         try {
-            String datasetName = "iris"; // 方便切换数据集
+            String datasetName = "zoo"; // 方便切换数据集
 
             // 1. 加载形式背景
             Context context = File.readFile("src/main/java/data/context/" + datasetName + ".data.txt");
@@ -121,7 +121,7 @@ public class GraphBuilderTest {
     @Test
     public void testBuildAndWriteAEAdjacencyMatrixUG(){
         try {
-            String datasetName = "iris"; // 方便切换数据集
+            String datasetName = "zoo"; // 方便切换数据集
 
             // 1. 加载形式背景
             Context context = File.readFile("src/main/java/data/context/" + datasetName + ".data.txt");

@@ -87,7 +87,7 @@ public class AnalysisTest {
     }
     @Test
     void AlgorithmAnalysisTest(){
-        String fileName = "test";
+        String fileName = "ilpd_processed";
         try {
             Context originalContext = File.readFile("src/main/java/data/context/" + fileName + "_deduplication.data.txt");
             ArrayList<Concept> originalLattice = LatticeFileHandler.readLatticeFromFile("src/main/java/data/lattice/" + fileName + "_deduplication_lattice.data.txt");

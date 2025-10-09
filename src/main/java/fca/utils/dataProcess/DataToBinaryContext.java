@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 public class DataToBinaryContext {
     public static void main(String[] args) {
         // 转换的数据集文件名
-        String datasetName = "car.data";
+        String datasetName = "zoo.data";
 
         System.out.println(datasetName + " 数据集转换...");
         System.out.println("原始文件路径: src/main/java/data/uci/" + datasetName);

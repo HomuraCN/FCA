@@ -54,7 +54,7 @@ public class PICbo53C_ae {
             }
         }
         res.offer(aeconcept);
-        System.out.println(aeconcept);
+//        System.out.println(aeconcept);
         while (!queue.isEmpty()){
             aeQueueItem item = queue.poll();
             BitSet new_intent=(BitSet)intent.clone();

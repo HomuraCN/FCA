@@ -13,7 +13,7 @@ public class NormalizedBinarizerCSVToBinaryContextDeduplicationRowAndCol {
     public static void main(String[] args) {
         // --- 配置区 ---
         // 1. 设置要处理的原始CSV文件名 (假设在 data/uci/ 目录下)
-        String uciDatasetName = "Maternal Health Risk Data Set.csv";
+        String uciDatasetName = "heart_disease_processed.csv";
 
         // 2. 自动生成输出文件名
         String baseName = uciDatasetName.endsWith(".csv") ? uciDatasetName.substring(0, uciDatasetName.length() - 4) : uciDatasetName;
