@@ -21,7 +21,7 @@ import static fca.utils.util.makeSet;
 
 public class BinaryContextToAELatticeP {
     public static void main(String[] args) {
-        String fileName = "iris";
+        String fileName = "zoo";
         String inputPath = "src/main/java/data/context/" + fileName + ".data.txt";
         String outputPath = "src/main/java/data/lattice3C/" + fileName + "_aelattice.data.txt";
 
@@ -30,7 +30,7 @@ public class BinaryContextToAELatticeP {
             System.out.println("Reading context from: " + inputPath);
             Context context = File.readFile(inputPath);
 
-            int n_threads=4;
+            int n_threads=32;
             int x=3;
             int objs_size=context.getObjs_size();
             int attrs_size=context.getAttrs_size();

@@ -19,7 +19,7 @@ public class ReductionToPermutations {
     public static void main(String[] args) {
         // --- 1. 配置 ---
         // 您可以在此处更改为您想要处理的约简文件。
-        String reductionFileName = "200_8_50_deduplication_reduction.data.txt";
+        String reductionFileName = "heart_disease_processed_deduplication_reduction.data.txt";
         String inputFilePath = "src/main/java/data/reduction/" + reductionFileName;
 
         System.out.println("Permutations 算法...");
