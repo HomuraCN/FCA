@@ -14,6 +14,7 @@ public class NormalizedBinarizerCSVToBinaryContextDeduplicationRowAndCol {
         // --- 配置区 ---
         // 1. 设置要处理的原始CSV文件名 (假设在 data/uci/ 目录下)
         String uciDatasetName = "heart_disease_processed.csv";
+        double percentile = 0.6;
 
         // 2. 自动生成输出文件名
         String baseName = uciDatasetName.endsWith(".csv") ? uciDatasetName.substring(0, uciDatasetName.length() - 4) : uciDatasetName;
@@ -27,7 +28,7 @@ public class NormalizedBinarizerCSVToBinaryContextDeduplicationRowAndCol {
 
         try {
             // 调用新的、专门处理CSV的净化方法
-            String outputFilePath = PurifyingCSVProcessor.process(inputFilePath, outputContextName);
+            String outputFilePath = PurifyingCSVProcessor.process(inputFilePath, outputContextName, percentile);
             System.out.println("输出的形式背景文件路径: " + outputFilePath);
 
             Path path = Paths.get(outputFilePath);

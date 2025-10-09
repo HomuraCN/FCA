@@ -8,14 +8,21 @@ import java.util.stream.Collectors;
 
 /**
  * 该类负责处理带标题行的CSV文件，并对数据进行净化（行和列去重）。
- * - 自动忽略CSV文件的第一行（标题行）。
- * - 对于数值型列: 归一化到[0,1], 然后根据均值进行二元化。
+ * - 对于数值型列: 根据设定的百分位数确定阈值进行二元化。
  * - 对于类别型列: 采用独热编码方式处理。
  * - 最后，移除内容完全相同的行和列。
  */
 public class PurifyingCSVProcessor {
 
-    public static String process(String inputFilePath, String outputFileName) throws IOException {
+    /**
+     * @param percentile 用于数值列二元化的百分位阈值 (取值范围 0.0 到 1.0)。
+     * 例如，0.8 表示只有数值高于80%分位点的值才会被设为1。
+     */
+    public static String process(String inputFilePath, String outputFileName, double percentile) throws IOException {
+        if (percentile < 0.0 || percentile > 1.0) {
+            throw new IllegalArgumentException("百分位数必须在 0.0 和 1.0 之间。");
+        }
+
         List<String[]> allDataRows = new ArrayList<>();
         String[] headers = null;
         int numAttributes = 0;
@@ -43,28 +50,28 @@ public class PurifyingCSVProcessor {
                 Double.parseDouble(col[i]);
             } catch (NumberFormatException e) {
                 isNumeric[i] = false;
-                break;
             }
         }
 
-        // --- 步骤 3: 预处理 - 计算均值 & 发现唯一的类别值 ---
-        double[] means = new double[numAttributes];
+        // --- 步骤 3: 预处理 - 计算百分位阈值 & 发现唯一的类别值 ---
+        double[] thresholds = new double[numAttributes]; // 存储每列的阈值
         Map<Integer, Set<String>> categoricalUniqueValues = new HashMap<>();
+
         for (int j = 0; j < numAttributes; j++) {
             if (isNumeric[j]) {
-                double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
+                List<Double> values = new ArrayList<>();
                 for (String[] row : allDataRows) {
-                    double val = Double.parseDouble(row[j]);
-                    if (val < min) min = val;
-                    if (val > max) max = val;
+                    values.add(Double.parseDouble(row[j]));
                 }
-                double range = max - min;
-                double sumOfNormalized = 0.0;
-                for (String[] row : allDataRows) {
-                    double val = Double.parseDouble(row[j]);
-                    sumOfNormalized += (range == 0) ? 0 : (val - min) / range;
+                // 排序以找到百分位点
+                Collections.sort(values);
+                // 计算阈值对应的索引
+                int index = (int) Math.floor(values.size() * percentile);
+                // 边界处理
+                if (index >= values.size()) {
+                    index = values.size() - 1;
                 }
-                means[j] = sumOfNormalized / allDataRows.size();
+                thresholds[j] = values.get(index);
             } else {
                 Set<String> uniqueVals = new HashSet<>();
                 for (String[] row : allDataRows) {
@@ -73,6 +80,7 @@ public class PurifyingCSVProcessor {
                 categoricalUniqueValues.put(j, uniqueVals);
             }
         }
+
 
         // --- 步骤 4: 构建新属性的映射表 (使用CSV的标题) ---
         LinkedHashMap<String, Integer> finalAttributeMap = new LinkedHashMap<>();
@@ -100,16 +108,11 @@ public class PurifyingCSVProcessor {
             for (int j = 0; j < numAttributes; j++) {
                 String headerName = headers[j].trim();
                 if (isNumeric[j]) {
+                    // --- 核心修改 ---
                     double val = Double.parseDouble(row[j]);
-                    double min = Double.MAX_VALUE, max = Double.MIN_VALUE;
-                    for (String[] r : allDataRows) {
-                        double v = Double.parseDouble(r[j]);
-                        if (v < min) min = v;
-                        if (v > max) max = v;
-                    }
-                    double range = max - min;
-                    double normalizedVal = (range == 0) ? 0 : (val - min) / range;
-                    int value = (normalizedVal < means[j]) ? 0 : 1;
+                    // 使用预先计算好的百分位阈值
+                    int value = (val > thresholds[j]) ? 1 : 0;
+
                     String key = headerName;
                     int colIdx = finalAttributeMap.get(key);
                     binaryData[i][colIdx] = value;
@@ -159,12 +162,12 @@ public class PurifyingCSVProcessor {
                 purifiedData[i][j] = rowDeduplicatedData[i][originalColumnIndex];
             }
         }
-        
+
         // --- 步骤 9: 将最终的净化结果写入文件 ---
         String outputDir = "src/main/java/data/context/";
         Files.createDirectories(Paths.get(outputDir));
         String finalOutputPath = outputDir + outputFileName;
-        
+
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(finalOutputPath))) {
             writer.write(finalNumObjects + "," + finalNumAttributes);
             writer.newLine();
