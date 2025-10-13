@@ -10,6 +10,8 @@ import fca.utils.readFile.File;
 import fca.utils.readFile.PurifyingCSVProcessor;
 import org.junit.jupiter.api.Test;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -33,8 +35,8 @@ public class DataProcessingPipelineTest {
     public void runFullPipeline() {
         // ======================= 配置区 =======================
         // 在这里修改三个核心参数即可
-        String datasetBaseName = "ilpd_processed"; // 无需.csv后缀
-        double percentile = 0.31;
+        String datasetBaseName = "wine_processed"; // 无需.csv后缀
+        double percentile = 0.55;
         int numThreads = 16;
         // ===================== 配置区结束 =====================
 
@@ -92,6 +94,15 @@ public class DataProcessingPipelineTest {
             Map<Integer, BitSet> nj = new HashMap<>();
             InClose3.inClose3_exe(context, initialConcept, 1, nj, allConcepts);
             System.out.println("  > 概念生成完成，共 " + allConcepts.size() + " 个概念。");
+
+            // 存储所有形式概念
+            String concept_outputFilePath = "src/main/java/data/lattice/" + datasetBaseName + "_deduplication_lattice.data.txt";
+            try (BufferedWriter bw = new BufferedWriter(new FileWriter(concept_outputFilePath))) {
+                for (Concept concept : allConcepts) {
+                    bw.write(concept.toString());
+                    bw.newLine();
+                }
+            }
 
             // 2.3 运行约简算法
             System.out.println("  > 正在运行 reduction_qis_Bit 约简算法...");

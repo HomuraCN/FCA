@@ -133,7 +133,7 @@ public class AnalysisTest {
     }
     @Test
     void AlgorithmAnalysisCsvTest(){
-        String fileName = "Maternal Health Risk Data Set";
+        String fileName = "wine_processed";
         // 定义输出CSV文件的路径
         String outputCsvFile = "src/main/java/data/analysis/" + fileName + "_analysis_results.csv";
 
