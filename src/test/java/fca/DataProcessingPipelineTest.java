@@ -13,9 +13,6 @@ import org.junit.jupiter.api.Test;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashMap;
@@ -26,8 +23,8 @@ import java.util.Queue;
 /**
  * 一个集成的测试类，用于按顺序执行完整的数据处理流程：
  * 1. 从CSV文件生成净化的二进制形式背景。
- * 2. 从形式背景生成代表概念集（约简）。
- * 3. 对约简结果进行置换操作。
+ * 2. 设置阈值
+ * 3. 从形式背景生成概念约简。
  */
 public class DataProcessingPipelineTest {
 

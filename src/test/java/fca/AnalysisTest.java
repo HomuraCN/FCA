@@ -131,6 +131,7 @@ public class AnalysisTest {
             throw new RuntimeException(e);
         }
     }
+    // 输出分析结果到 src/main/java/data/analysis/
     @Test
     void AlgorithmAnalysisCsvTest(){
         String fileName = "wine_processed";
