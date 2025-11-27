@@ -21,7 +21,7 @@ public class reductionByObjOrAttr {
         String inputFileName = "iris.data.txt";
         String inputFilePath = "src/main/java/data/context/" + inputFileName;
 
-        String outputDir = "src/main/java/data/lattice/";
+        String outputDir = "src/main/java/data/latticeObjAttr/";
         String baseName = inputFileName;
         // 检查并移除后缀
         if (baseName.endsWith(".data.txt")) {
@@ -30,8 +30,8 @@ public class reductionByObjOrAttr {
             baseName = baseName.substring(0, baseName.length() - ".txt".length());
         }
 
-        // 输出文件名，例如 iris_concepts.txt
-        String outputFileName = baseName + "_reduction_lattice.data.txt";
+        // 输出文件名，例如 iris_obj_attr_lattice.data.txt
+        String outputFileName = baseName + "_obj_attr_lattice.data.txt";
         String outputFilePath = outputDir + outputFileName;
 
         System.out.println("--- 开始执行 Reduction 算法 ---");

@@ -94,6 +94,32 @@ public class GraphBuilderTest {
         }
     }
     @Test
+    public void testBuildAndWriteObjAttrAdjacencyMatrixDG() {
+        try {
+            String datasetName = "iris"; // 方便切换数据集
+
+            // 1. 加载形式背景
+            Context context = File.readFile("src/main/java/data/context/" + datasetName + ".data.txt");
+            int objectCount = context.getObjs_size();
+
+            // 2. 加载概念格
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/latticeObjAttr/" + datasetName + "_obj_attr_lattice.data.txt");
+
+            // 3. 构建邻接矩阵
+            System.out.println("正在构建邻接矩阵 A_plus...");
+            int[][] a_plus = GraphBuilder.buildAdjacencyMatrixDG(concepts, objectCount);
+            System.out.println("构建完成。");
+
+            // 4. 将矩阵写入文件
+            String outputFilePath = "src/main/java/data/graph/" + datasetName + "_obj_attr_A_plus_DG.csv";
+            GraphBuilder.writeMatrixToFile(a_plus, outputFilePath);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Test
     public void testBuildAndWriteAdjacencyMatrixUG() {
         try {
             String datasetName = "zoo"; // 方便切换数据集
@@ -138,6 +164,31 @@ public class GraphBuilderTest {
             // 4. 将矩阵写入文件
             String outputFilePath = "src/main/java/data/graph/" + datasetName + "_A_negative_UG.csv";
             GraphBuilder.writeMatrixToFile(a_negative, outputFilePath);
+
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    @Test
+    public void testBuildAndWriteObjAttrAdjacencyMatrixUG() {
+        try {
+            String datasetName = "iris"; // 方便切换数据集
+
+            // 1. 加载形式背景
+            Context context = File.readFile("src/main/java/data/context/" + datasetName + ".data.txt");
+            int objectCount = context.getObjs_size();
+
+            // 2. 加载概念格
+            ArrayList<Concept> concepts = LatticeFileHandler.readLatticeFromFile("src/main/java/data/latticeObjAttr/" + datasetName + "_obj_attr_lattice.data.txt");
+
+            // 3. 构建邻接矩阵
+            System.out.println("正在构建邻接矩阵 A_plus...");
+            int[][] a_plus = GraphBuilder.buildAdjacencyMatrixUG(concepts, objectCount);
+            System.out.println("构建完成。");
+
+            // 4. 将矩阵写入文件
+            String outputFilePath = "src/main/java/data/graph/" + datasetName + "_obj_attr_A_plus_UG.csv";
+            GraphBuilder.writeMatrixToFile(a_plus, outputFilePath);
 
         } catch (IOException e) {
             throw new RuntimeException(e);
