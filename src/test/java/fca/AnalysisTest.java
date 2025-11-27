@@ -134,7 +134,7 @@ public class AnalysisTest {
     // 输出分析结果到 src/main/java/data/analysis/
     @Test
     void AlgorithmAnalysisCsvTest(){
-        String fileName = "wine_processed";
+        String fileName = "automobile_processed";
         // 定义输出CSV文件的路径
         String outputCsvFile = "src/main/java/data/analysis/" + fileName + "_analysis_results.csv";
 

@@ -32,7 +32,7 @@ public class DataProcessingPipelineTest {
     public void runFullPipeline() {
         // ======================= 配置区 =======================
         // 在这里修改三个核心参数即可
-        String datasetBaseName = "wine_processed"; // 无需.csv后缀
+        String datasetBaseName = "automobile_processed"; // 无需.csv后缀
         double percentile = 0.55;
         int numThreads = 16;
         // ===================== 配置区结束 =====================
