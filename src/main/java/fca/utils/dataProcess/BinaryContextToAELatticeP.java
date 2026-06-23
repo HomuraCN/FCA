@@ -21,7 +21,7 @@ import static fca.utils.util.makeSet;
 
 public class BinaryContextToAELatticeP {
     public static void main(String[] args) {
-        String fileName = "zoo";
+        String fileName = "nursery";
         String inputPath = "src/main/java/data/context/" + fileName + ".data.txt";
         String outputPath = "src/main/java/data/lattice3C/" + fileName + "_aelattice.data.txt";
 
