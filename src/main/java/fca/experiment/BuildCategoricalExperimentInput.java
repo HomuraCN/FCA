@@ -71,10 +71,17 @@ public class BuildCategoricalExperimentInput {
 
         Context context = File.readFile(outputDir.resolve(config.dataset + ".data.txt").toString());
         ArrayList<Concept> positiveConcepts = buildPositiveLattice(context);
-        ArrayList<AEConcept_id> negativeConcepts = buildCoreNegativeLattice(
-                context,
-                config.aeSplitDepth,
-                config.aeThreads);
+        ArrayList<AEConcept_id> negativeConcepts;
+        if (config.minSupPos > 1 || config.minSupNeg > 1) {
+            negativeConcepts = buildIcebergCoreNegativeLattice(context, config.minSupPos, config.minSupNeg);
+            System.out.println("Iceberg core AE lattice (minSupPos=" + config.minSupPos
+                    + ", minSupNeg=" + config.minSupNeg + "): " + negativeConcepts.size() + " concepts");
+        } else {
+            negativeConcepts = buildCoreNegativeLattice(
+                    context,
+                    config.aeSplitDepth,
+                    config.aeThreads);
+        }
 
         LatticeFileHandler.writeLatticeToFile(
                 positiveConcepts,
@@ -296,6 +303,32 @@ public class BuildCategoricalExperimentInput {
         return new ArrayList<>(allConcepts);
     }
 
+    /**
+     * 冰山版核心负概念格：与 buildCoreNegativeLattice 语义一致（正负外延均非空），
+     * 额外要求 |extent| >= minSupPos 且 |extent_n| >= minSupNeg（阈值为 1 时二者输出相同）。
+     * 顶概念 (∅, ∅, M) 与既有管线保持一致仍然保留。
+     */
+    private static ArrayList<AEConcept_id> buildIcebergCoreNegativeLattice(Context context,
+                                                                           int minSupPos,
+                                                                           int minSupNeg) {
+        AEConcept startConcept = new AEConcept();
+        startConcept.setExtent(makeSet(context.getObjs_size()));
+        startConcept.setExtent_n(makeSet(context.getObjs_size()));
+        startConcept.setIntent(makeSet(0));
+
+        Queue<AEConcept> concepts = new LinkedList<>();
+        fca.algorithm.concept3c_ae.ICbo53C_aeIceberg.exe(
+                context, startConcept, 1, new BitSet(), concepts, minSupPos, minSupNeg);
+
+        ArrayList<AEConcept_id> result = new ArrayList<>(concepts.size() + 1);
+        int id = 1;
+        result.add(new AEConcept_id(id++, makeSet(0), makeSet(0), makeSet(context.getAttrs_size())));
+        for (AEConcept concept : concepts) {
+            result.add(new AEConcept_id(id++, concept.getExtent(), concept.getExtent_n(), concept.getIntent()));
+        }
+        return result;
+    }
+
     private static ArrayList<AEConcept_id> buildCoreNegativeLattice(Context context,
                                                                     int splitDepth,
                                                                     int threads) {
@@ -419,6 +452,8 @@ public class BuildCategoricalExperimentInput {
             writer.write("  \"feature_columns\": " + encoded.featureNames.size() + ",\n");
             writer.write("  \"profile_bins\": " + config.profileBins + ",\n");
             writer.write("  \"skip_adjacency\": " + config.skipAdjacency + ",\n");
+            writer.write("  \"min_sup_pos\": " + config.minSupPos + ",\n");
+            writer.write("  \"min_sup_neg\": " + config.minSupNeg + ",\n");
             writer.write("  \"positive_concepts\": " + positiveConcepts.size() + ",\n");
             writer.write("  \"negative_concepts\": " + negativeConcepts.size() + "\n");
             writer.write("}\n");
@@ -444,6 +479,8 @@ public class BuildCategoricalExperimentInput {
         private int aeSplitDepth = DEFAULT_AE_SPLIT_DEPTH;
         private int aeThreads = DEFAULT_AE_THREADS;
         private boolean skipAdjacency = false;
+        private int minSupPos = 1;
+        private int minSupNeg = 1;
 
         private static Config parse(String[] args) {
             Map<String, String> values = new HashMap<>();
@@ -471,6 +508,8 @@ public class BuildCategoricalExperimentInput {
             config.aeThreads = parseInt(values, "ae-threads", config.aeThreads);
             config.skipAdjacency = parseBoolean(values, "skip-adjacency",
                     parseBoolean(values, "skip", config.skipAdjacency));
+            config.minSupPos = parseInt(values, "min-sup-pos", config.minSupPos);
+            config.minSupNeg = parseInt(values, "min-sup-neg", config.minSupNeg);
             return config;
         }
 
@@ -505,7 +544,7 @@ public class BuildCategoricalExperimentInput {
             System.out.println("  --input-dir /abs/path/to/raw_csv_folder \\");
             System.out.println("  --output-dir /abs/path/to/experiment_inputs \\");
             System.out.println("  [--label-column last|class|6] [--profile-bins 8] [--ae-split-depth 3] [--ae-threads 16] \\");
-            System.out.println("  [--skip-adjacency true|false]");
+            System.out.println("  [--skip-adjacency true|false] [--min-sup-pos 1] [--min-sup-neg 1]");
             System.exit(0);
         }
     }
