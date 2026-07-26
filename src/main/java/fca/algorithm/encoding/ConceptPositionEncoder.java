@@ -31,6 +31,21 @@ public class ConceptPositionEncoder {
         SUPPORT_WEIGHTED_MEAN
     }
 
+    /**
+     * 概念层级分级方式。
+     *
+     * <p>LONGEST_PATH_DP：原有的最长特化链深度，逐对子集比较，O(C²·N)；
+     * INTENT_SIZE：内涵基数分级 g(c)=|Int(c)|-|Int(top)|，O(C)。
+     * 由于每走一步覆盖关系内涵至少增加一个属性，恒有 d(c) ≤ |Int(c)|-|Int(top)|；
+     * 在完全析因背景（如 car、nursery）上二者严格相等，一般背景为强近似
+     * （tic_tac_toe 正/负格实测 97.75%/95.91% 概念相等，秩相关约 0.99）。
+     * 空外延的哨兵概念取 maxNonempty+1，与 DP 对其的实际输出保持一致。</p>
+     */
+    public enum GradingMode {
+        LONGEST_PATH_DP,
+        INTENT_SIZE
+    }
+
     private ConceptPositionEncoder() {
     }
 
@@ -48,6 +63,78 @@ public class ConceptPositionEncoder {
      */
     public static int[] computeNegativeConceptDepths(ArrayList<AEConcept_id> concepts) {
         return computeConceptDepths(concepts, AEConcept_id::getExtent_n);
+    }
+
+    /**
+     * 按指定分级方式计算普通形式概念的层级分级。
+     */
+    public static int[] computeConceptGradings(ArrayList<Concept> concepts, GradingMode mode) {
+        return switch (mode) {
+            case LONGEST_PATH_DP -> computeConceptDepths(concepts);
+            case INTENT_SIZE -> computeIntentSizeGradings(concepts, Concept::getIntent, Concept::getExtent);
+        };
+    }
+
+    /**
+     * 按指定分级方式计算三支概念负视图（extent_n 隶属）的层级分级。
+     */
+    public static int[] computeNegativeConceptGradings(ArrayList<AEConcept_id> concepts, GradingMode mode) {
+        return switch (mode) {
+            case LONGEST_PATH_DP -> computeNegativeConceptDepths(concepts);
+            case INTENT_SIZE -> computeIntentSizeGradings(concepts, AEConcept_id::getIntent, AEConcept_id::getExtent_n);
+        };
+    }
+
+    /**
+     * 内涵基数分级：g(c) = |Int(c)| - |Int(top)|，top 为隶属外延最大的概念。
+     *
+     * <p>隶属外延为空的哨兵概念（如人工顶/底）不承载任何对象权重，
+     * 其分级取非空概念最大分级 + 1，与最长链 DP 对它们的输出一致，
+     * 从而保证分箱归一化分母与 DP 版本可比。</p>
+     */
+    private static <T> int[] computeIntentSizeGradings(List<T> concepts,
+                                                      Function<T, BitSet> intentGetter,
+                                                      Function<T, BitSet> extentGetter) {
+        int n = concepts == null ? 0 : concepts.size();
+        int[] gradings = new int[n];
+        if (n == 0) {
+            return gradings;
+        }
+
+        int topIntentSize = 0;
+        int maxCardinality = -1;
+        for (T concept : concepts) {
+            int cardinality = safeExtent(extentGetter.apply(concept)).cardinality();
+            if (cardinality > maxCardinality) {
+                maxCardinality = cardinality;
+                topIntentSize = safeExtent(intentGetter.apply(concept)).cardinality();
+            }
+        }
+
+        int maxNonempty = 0;
+        boolean hasSentinel = false;
+        for (int i = 0; i < n; i++) {
+            T concept = concepts.get(i);
+            if (safeExtent(extentGetter.apply(concept)).isEmpty()) {
+                gradings[i] = -1;
+                hasSentinel = true;
+            } else {
+                int grading = Math.max(0,
+                        safeExtent(intentGetter.apply(concept)).cardinality() - topIntentSize);
+                gradings[i] = grading;
+                if (grading > maxNonempty) {
+                    maxNonempty = grading;
+                }
+            }
+        }
+        if (hasSentinel) {
+            for (int i = 0; i < n; i++) {
+                if (gradings[i] < 0) {
+                    gradings[i] = maxNonempty + 1;
+                }
+            }
+        }
+        return gradings;
     }
 
     /**
@@ -106,6 +193,26 @@ public class ConceptPositionEncoder {
                                                                   int binCount) {
         int[] conceptDepths = computeNegativeConceptDepths(concepts);
         return aggregateObjectDepthProfileCPE(concepts, AEConcept_id::getExtent_n, conceptDepths, objectCount, binCount);
+    }
+
+    /**
+     * 使用外部预计算的概念分级构造正视图 depth profile CPE，避免重复分级计算。
+     */
+    public static double[][] computeObjectDepthProfileCPE(ArrayList<Concept> concepts,
+                                                          int objectCount,
+                                                          int binCount,
+                                                          int[] conceptGradings) {
+        return aggregateObjectDepthProfileCPE(concepts, Concept::getExtent, conceptGradings, objectCount, binCount);
+    }
+
+    /**
+     * 使用外部预计算的概念分级构造负视图 depth profile CPE，避免重复分级计算。
+     */
+    public static double[][] computeNegativeObjectDepthProfileCPE(ArrayList<AEConcept_id> concepts,
+                                                                  int objectCount,
+                                                                  int binCount,
+                                                                  int[] conceptGradings) {
+        return aggregateObjectDepthProfileCPE(concepts, AEConcept_id::getExtent_n, conceptGradings, objectCount, binCount);
     }
 
     public static void writeCPEToFile(double[][] cpe, String filePath) throws IOException {
