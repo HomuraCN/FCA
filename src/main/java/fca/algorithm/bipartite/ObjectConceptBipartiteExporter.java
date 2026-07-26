@@ -35,7 +35,18 @@ public class ObjectConceptBipartiteExporter {
                                       int profileBins,
                                       String outputPrefix) throws IOException {
         int[] depths = ConceptPositionEncoder.computeConceptDepths(concepts);
+        exportPositive(concepts, objectCount, attributeCount, profileBins, outputPrefix, depths);
+    }
 
+    /**
+     * 使用外部预计算的概念分级导出，避免重复的深度/分级计算。
+     */
+    public static void exportPositive(ArrayList<Concept> concepts,
+                                      int objectCount,
+                                      int attributeCount,
+                                      int profileBins,
+                                      String outputPrefix,
+                                      int[] depths) throws IOException {
         writePositiveMembershipEdges(concepts, objectCount, outputPrefix + "_edges.csv");
         writePositiveConceptFeatures(
                 concepts,
@@ -52,7 +63,18 @@ public class ObjectConceptBipartiteExporter {
                                       int profileBins,
                                       String outputPrefix) throws IOException {
         int[] depths = ConceptPositionEncoder.computeNegativeConceptDepths(concepts);
+        exportNegative(concepts, objectCount, attributeCount, profileBins, outputPrefix, depths);
+    }
 
+    /**
+     * 使用外部预计算的概念分级导出，避免重复的深度/分级计算。
+     */
+    public static void exportNegative(ArrayList<AEConcept_id> concepts,
+                                      int objectCount,
+                                      int attributeCount,
+                                      int profileBins,
+                                      String outputPrefix,
+                                      int[] depths) throws IOException {
         writeNegativeMembershipEdges(concepts, objectCount, outputPrefix + "_edges.csv");
         writeNegativeConceptFeatures(
                 concepts,

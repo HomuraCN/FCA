@@ -103,20 +103,29 @@ public class BuildCategoricalExperimentInput {
                     outputDir.resolve(config.dataset + "_A_negative_UG.csv").toString());
         }
 
+        long gradingStart = System.currentTimeMillis();
+        int[] positiveGradings = ConceptPositionEncoder.computeConceptGradings(positiveConcepts, config.grading);
+        int[] negativeGradings = ConceptPositionEncoder.computeNegativeConceptGradings(negativeConcepts, config.grading);
+        System.out.println("Concept gradings (" + gradingLabel(config.grading) + ") computed once in "
+                + (System.currentTimeMillis() - gradingStart) + " ms, shared by CPE and bipartite export");
+
         ConceptPositionEncoder.writeCPEToFile(
                 ConceptPositionEncoder.computeObjectDepthProfileCPE(
                         positiveConcepts,
                         context.getObjs_size(),
-                        config.profileBins),
+                        config.profileBins,
+                        positiveGradings),
                 outputDir.resolve(config.dataset + "_CPE_A_plus_depth_profile" + config.profileBins + ".csv").toString());
         ConceptPositionEncoder.writeCPEToFile(
                 ConceptPositionEncoder.computeNegativeObjectDepthProfileCPE(
                         negativeConcepts,
                         context.getObjs_size(),
-                        config.profileBins),
+                        config.profileBins,
+                        negativeGradings),
                 outputDir.resolve(config.dataset + "_CPE_A_negative_depth_profile" + config.profileBins + ".csv").toString());
 
-        writeObjectConceptBipartite(outputDir, config.dataset, context, positiveConcepts, negativeConcepts, config.profileBins);
+        writeObjectConceptBipartite(outputDir, config.dataset, context, positiveConcepts, negativeConcepts,
+                config.profileBins, positiveGradings, negativeGradings);
         writeManifest(outputDir.resolve("manifest.json"), config, outputDir, columnNames, labelColumnIndex, encoded, positiveConcepts, negativeConcepts);
 
         System.out.println();
@@ -408,19 +417,23 @@ public class BuildCategoricalExperimentInput {
                                                     Context context,
                                                     ArrayList<Concept> positiveConcepts,
                                                     ArrayList<AEConcept_id> negativeConcepts,
-                                                    int profileBins) throws IOException {
+                                                    int profileBins,
+                                                    int[] positiveGradings,
+                                                    int[] negativeGradings) throws IOException {
         ObjectConceptBipartiteExporter.exportPositive(
                 positiveConcepts,
                 context.getObjs_size(),
                 context.getAttrs_size(),
                 profileBins,
-                outputDir.resolve(dataset + "_positive_object_concept").toString());
+                outputDir.resolve(dataset + "_positive_object_concept").toString(),
+                positiveGradings);
         ObjectConceptBipartiteExporter.exportNegative(
                 negativeConcepts,
                 context.getObjs_size(),
                 context.getAttrs_size(),
                 profileBins,
-                outputDir.resolve(dataset + "_negative_object_concept").toString());
+                outputDir.resolve(dataset + "_negative_object_concept").toString(),
+                negativeGradings);
         gzipAndDelete(outputDir.resolve(dataset + "_positive_object_concept_edges.csv"));
         gzipAndDelete(outputDir.resolve(dataset + "_negative_object_concept_edges.csv"));
     }
@@ -454,6 +467,7 @@ public class BuildCategoricalExperimentInput {
             writer.write("  \"skip_adjacency\": " + config.skipAdjacency + ",\n");
             writer.write("  \"min_sup_pos\": " + config.minSupPos + ",\n");
             writer.write("  \"min_sup_neg\": " + config.minSupNeg + ",\n");
+            writer.write("  \"grading\": \"" + gradingLabel(config.grading) + "\",\n");
             writer.write("  \"positive_concepts\": " + positiveConcepts.size() + ",\n");
             writer.write("  \"negative_concepts\": " + negativeConcepts.size() + "\n");
             writer.write("}\n");
@@ -462,6 +476,10 @@ public class BuildCategoricalExperimentInput {
 
     private static String escapeJson(String value) {
         return value.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
+    private static String gradingLabel(ConceptPositionEncoder.GradingMode mode) {
+        return mode == ConceptPositionEncoder.GradingMode.INTENT_SIZE ? "intent" : "dp";
     }
 
     private record EncodedDataset(List<int[]> featureMatrix, List<String> labels, List<String> featureNames) {
@@ -481,6 +499,7 @@ public class BuildCategoricalExperimentInput {
         private boolean skipAdjacency = false;
         private int minSupPos = 1;
         private int minSupNeg = 1;
+        private ConceptPositionEncoder.GradingMode grading = ConceptPositionEncoder.GradingMode.INTENT_SIZE;
 
         private static Config parse(String[] args) {
             Map<String, String> values = new HashMap<>();
@@ -510,7 +529,22 @@ public class BuildCategoricalExperimentInput {
                     parseBoolean(values, "skip", config.skipAdjacency));
             config.minSupPos = parseInt(values, "min-sup-pos", config.minSupPos);
             config.minSupNeg = parseInt(values, "min-sup-neg", config.minSupNeg);
+            config.grading = parseGrading(values, config.grading);
             return config;
+        }
+
+        private static ConceptPositionEncoder.GradingMode parseGrading(Map<String, String> values,
+                                                                       ConceptPositionEncoder.GradingMode defaultValue) {
+            String value = values.get("grading");
+            if (value == null) {
+                return defaultValue;
+            }
+            return switch (value.toLowerCase()) {
+                case "intent", "intent-size" -> ConceptPositionEncoder.GradingMode.INTENT_SIZE;
+                case "dp", "depth", "longest-path" -> ConceptPositionEncoder.GradingMode.LONGEST_PATH_DP;
+                default -> throw new IllegalArgumentException(
+                        "Invalid value for --grading: " + value + " (expected intent|dp)");
+            };
         }
 
         private static String required(Map<String, String> values, String key) {
@@ -544,7 +578,8 @@ public class BuildCategoricalExperimentInput {
             System.out.println("  --input-dir /abs/path/to/raw_csv_folder \\");
             System.out.println("  --output-dir /abs/path/to/experiment_inputs \\");
             System.out.println("  [--label-column last|class|6] [--profile-bins 8] [--ae-split-depth 3] [--ae-threads 16] \\");
-            System.out.println("  [--skip-adjacency true|false] [--min-sup-pos 1] [--min-sup-neg 1]");
+            System.out.println("  [--skip-adjacency true|false] [--min-sup-pos 1] [--min-sup-neg 1] \\");
+            System.out.println("  [--grading intent|dp]  (intent: O(C) 内涵基数分级, 默认; dp: 原 O(C^2) 最长链深度, 校验用)");
             System.exit(0);
         }
     }
